@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import Header from "./_components/Header";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
+import { User } from "lucide-react";
+import { UserDetailContext } from "@/context/UserDetailContext";
 
 function Provider({
   children,
@@ -13,7 +15,7 @@ function Provider({
 }>) {
 
   const CreateUser=useMutation(api.user.CreateNewUser);
-
+  const [userDetails,setUserDetails]=useState<any>();
   const {user}=useUser();
 
   useEffect(() => {
@@ -29,17 +31,23 @@ function Provider({
       email: user?.primaryEmailAddress?.emailAddress ?? '',
       imageUrl:user?.imageUrl,
       name:user?.fullName ?? ''
-      }
-
-    );
+      });
+      setUserDetails(result);
   }
 }
 
   return (
+    <UserDetailContext.Provider value={{userDetails,setUserDetails}}>
     <div>
         <Header/>
-        {children}</div>
+        {children}
+    </div>
+    </UserDetailContext.Provider>
   )
 }
 
 export default Provider
+
+export const useUserDetails = () => {
+  return useContext(UserDetailContext);
+}
