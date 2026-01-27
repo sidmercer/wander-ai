@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { SignInButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -21,9 +22,9 @@ const menuOptions=[
 
 function Header() {
   return (
-    <div className='flex justify-between items-center p-4 '>
+    <div className='flex justify-between items-center p-4 pl-8  '>
         {/* {logo} */}
-        <Image src={'/logo.svg'} width={170} height={180} alt='WanderAI-logo' />
+        <Image src={'/logo.svg'} width={187} height={198} alt='WanderAI-logo' />
 
         {/* { Menu Options } */}
         <div className='flex gap-8 items-center'>
@@ -38,7 +39,10 @@ function Header() {
         </div>
 
         {/* { get started button} */}
-        <Button>Get Started</Button>
+        <SignInButton mode='modal'>
+            <Button>Get Started</Button>
+        </SignInButton>
+        
 
     </div>
   )

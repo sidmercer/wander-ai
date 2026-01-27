@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.36.10",
     "@radix-ui/react-slot": "^1.2.4",
     "@tabler/icons-react": "^3.36.1",
     "class-variance-authority": "^0.7.1",
