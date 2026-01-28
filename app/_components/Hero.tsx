@@ -41,6 +41,7 @@ const onSend=()=>{
         return ;
     }
     // else open modal to create trip
+    router.push('/create-new-trip');
 }
 
   return (
