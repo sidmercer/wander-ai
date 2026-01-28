@@ -2,37 +2,112 @@
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import axios from 'axios'
 import { Send } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
+
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
 
 export default function ChatBox() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [userInput, setUserInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const onSend=()=>{
-        // handle send message
+  const onSend = async () => {
+    if (!userInput.trim()) return;
+
+    const newMsg: Message = {
+      role: "user",
+      content: userInput,
+    };
+
+    // Update UI immediately
+    const updatedMessages = [...messages, newMsg];
+    setMessages(updatedMessages);
+    setUserInput("");
+    setLoading(true);
+
+    try {
+      const res = await axios.post("/api/aimodel", {
+        messages: updatedMessages,
+      });
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: res.data.resp, // Mapping the JSON response
+        },
+      ]);
+    } catch (error) {
+      console.error("Error fetching AI response", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
   return (
-    <div className='h-[80vh] flex flex-col ' >
-        {/* display messages here */}
-        <section className='flex-1 overflow-y-auto p-4'>
-            <div className='flex justify-end mt-2'>
-                <div className='max-w-lg bg-primary text-white px-4 py-2 rounded-lg '>
+    <div className='h-[80vh] flex flex-col'>
+        
+        {/* Display Messages Area */}
+        <section className='flex-1 overflow-y-auto p-4 space-y-4'>
+            {/* Initial Greeting (Static) */}
+            <div className='flex justify-start'>
+                <div className='max-w-lg text-black bg-gray-100 px-4 py-2 rounded-lg'>
                     Hello! I'm Wander AI, your personal trip planner. How can I assist you today?
                 </div>
             </div>
-            <div className='flex justify-start mt-2'>
-                <div className='max-w-lg text-black bg-gray-100 px-4 py-2 rounded-lg '>
-                    Ai agent msg
+
+            {/* Dynamic Messages Loop */}
+            {messages.map((msg, index) => (
+                <div 
+                  key={index} 
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                    <div className={`max-w-lg px-4 py-2 rounded-lg ${
+                        msg.role === 'user' 
+                        ? 'bg-primary text-white' // User Style
+                        : 'bg-gray-100 text-black' // AI Style
+                    }`}>
+                        {msg.content}
+                    </div>
                 </div>
-            </div>
+            ))}
+            
+            {/* Loading Indicator */}
+            {loading && (
+                <div className='flex justify-start'>
+                    <div className='text-sm text-gray-500 animate-pulse'>
+                        Wander AI is typing...
+                    </div>
+                </div>
+            )}
         </section>
+
         {/* User input box */}
         <section>
-             <div className='border rounded-2xl p-4 relative ' >
-                <Textarea placeholder='Create a trip from [origin] to [destination] '
-                 className='w-full h-28 bg-transparent border-none focus-visible:ring-0 shadow-none resize-none '
+             <div className='border rounded-2xl p-4 relative'>
+                <Textarea 
+                 placeholder='Start your trip planning...say hello!'
+                 className='w-full h-28 bg-transparent border-none focus-visible:ring-0 shadow-none resize-none'
+                 onChange={(event) => setUserInput(event.target.value)}
+                 value={userInput}
+                 onKeyDown={(e) => {
+                    if(e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        onSend();
+                    }
+                 }}
                 />
-                <Button size={'icon'} className='absolute bottom-6 right-6 ' onClick={()=>onSend()} >
+                <Button 
+                  size={'icon'} 
+                  className='absolute bottom-6 right-6' 
+                  onClick={onSend}
+                  disabled={loading}
+                >
                     <Send className='h-4 w-4' />
                 </Button>
             </div>
