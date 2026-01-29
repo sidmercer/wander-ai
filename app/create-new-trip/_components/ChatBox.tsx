@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import axios from 'axios'
 import { Send } from 'lucide-react'
 import React, { useState } from 'react'
+import EmptyBoxState from './EmptyBoxState'
 
 type Message = {
   role: "user" | "assistant";
@@ -51,7 +52,9 @@ export default function ChatBox() {
 
   return (
     <div className='h-[80vh] flex flex-col'>
-        
+        {messages.length == 0 &&
+         <EmptyBoxState onSelectOption={(v:string)=>{setUserInput(v); onSend()}} />
+        }
         {/* Display Messages Area */}
         <section className='flex-1 overflow-y-auto p-4 space-y-4'>
             {/* Initial Greeting (Static) */}
