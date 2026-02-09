@@ -140,3 +140,4 @@ export async function POST(req: NextRequest) {
     });
   }
 }
+// Note: The above code is designed to work with Google's Gemini models. Make sure to adjust the model name and parameters based on your specific use case and the models available in your Google Cloud project.
