@@ -3,13 +3,19 @@
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import axios from 'axios'
-import { Send } from 'lucide-react'
+import { Group, Send } from 'lucide-react'
 import React, { useState } from 'react'
 import EmptyBoxState from './EmptyBoxState'
+import GroupSizeUi from './GroupSizeUi'
+import { v } from 'convex/values'
+import BudgetUi from './BudgetUi'
+import SelectDays from './SelectDays'
+import FinalUi from './FinalUi'
 
 type Message = {
   role: "user" | "assistant";
   content: string;
+  ui?: string;
 };
 
 export default function ChatBox() {
@@ -41,6 +47,7 @@ export default function ChatBox() {
         {
           role: "assistant",
           content: res.data.resp, // Mapping the JSON response
+          ui: res.data.ui,       // New UI field
         },
       ]);
     } catch (error) {
@@ -48,6 +55,27 @@ export default function ChatBox() {
     } finally {
       setLoading(false);
     }
+
+  };
+
+  const RenderGenrativeUi=(ui:string)=>{
+    if(ui=='budget'){
+      // budget component
+      return <BudgetUi onSelectedOptions={(v:string)=>{setUserInput(v); onSend()}} />
+    }
+    else if(ui =='groupSize'){
+      // group size component
+      return <GroupSizeUi onSelectedOptions={(v:string)=>{setUserInput(v); onSend()}} />
+    }
+    else if(ui=='tripDuration'){
+      // trip duration component
+      return <SelectDays onSelectedOption={(v:string)=>{setUserInput(v); onSend()}} />
+    }
+    else if(ui=='final'){
+      // final component with view trip button
+      return <FinalUi viewTrip={()=>console.log()}/>;
+    }
+    return null;
   };
 
   return (
@@ -76,6 +104,7 @@ export default function ChatBox() {
                         : 'bg-gray-100 text-black' // AI Style
                     }`}>
                         {msg.content}
+                        {RenderGenrativeUi(msg.ui ?? '')}
                     </div>
                 </div>
             ))}
